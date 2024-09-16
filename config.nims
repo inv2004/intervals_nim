@@ -1,6 +1,7 @@
 switch("define", "ssl")
 switch("stackTrace", "on")
 switch("lineTrace", "on")
+switch("passC", "-Wno-error=incompatible-pointer-types")
 
 from macros import error
 
