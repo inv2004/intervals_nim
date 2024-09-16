@@ -13,3 +13,6 @@ bin           = @["intervals_nim"]
 requires "nim >= 2.0.2"
 requires "oauth"
 requires "asciigraph"
+
+task static, "build static release":
+  exec "nimble build -d:musl -d:release -d:libressl -d:pcre"
