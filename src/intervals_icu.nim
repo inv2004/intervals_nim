@@ -5,6 +5,7 @@ import std/json
 import std/sequtils
 import std/algorithm
 import std/strutils
+import std/logging
 
 import objs
 import analytics
@@ -73,4 +74,6 @@ proc virtualVal*(xx: seq[Activity]): string =
 
 proc resultVal*(xx: seq[Activity], plan: string): string =
   if plan != "":
-    return "bot: " & $normalize_plan(plan).process(xx)[1]
+    let res = $normalize_plan(plan).process(xx)[1]
+    info "Result: ", res
+    return "bot: " & res
