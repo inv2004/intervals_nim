@@ -2,6 +2,7 @@ import std/times
 import std/os
 import std/strutils
 import std/logging
+import std/sequtils
 
 import asciigraph
 
@@ -20,8 +21,7 @@ proc run(offset: int) =
   let activities = activities(today)
   info "Activities:"
   for x in activities:
-    info "    ", x.name
-    echo plot(x.watts, width = 110, height = 10)
+    info "    ", x.name, "\n" & plot(x.watts, width = 110, height = 10).splitLines().mapIt("W: " & it).join("\n")
   if activities.len > 0:
     let stat = stats(activities)
     info "Stats: ", stat

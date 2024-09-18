@@ -202,7 +202,7 @@ proc expandTemplate(pattern: seq[Pattern]): seq[int] =
       result.add(val.duration.int)
 
 proc process*(pattern: seq[Pattern], tw: seq[Activity]): (int, seq[Interval]) =
-  trace "Processing: " & $pattern
+  debug "Processing: " & $pattern
 
   if tw.len == 0:
     return (0, @[])
