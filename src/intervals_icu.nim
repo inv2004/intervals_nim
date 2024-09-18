@@ -48,13 +48,6 @@ proc activities*(today: DateTime): seq[Activity] =
   client.headers["Authorization"] = "Basic " & base64.encode("API_KEY:" & INTERVALS_API_KEY)
   client.findActivities(today, INTERVALS_ATHLETE).mapIt(client.activity(it))
 
-proc stats*(xx: seq[Activity]): Activity =
-  xx.foldl(Activity(
-    calories: a.calories + b.calories,
-    moving_time: a.moving_time + b.moving_time,
-    distance: a.distance + b.distance
-  ), result)
-
 proc distanceSumVal*(xx: seq[Activity]): string =
   if xx.len > 0:
     return '=' & xx.mapIt(it.distance / 1000).mapIt($it.int).join("+")
@@ -77,3 +70,15 @@ proc resultVal*(xx: seq[Activity], plan: string): string =
     let res = $normalize_plan(plan).process(xx)[1]
     info "Result: ", res
     return "bot: " & res
+
+proc stat*(xx: seq[Activity]): string =
+  result.add "(calories: "
+  result.add $xx.mapIt(it.calories).foldl(a + b)
+  result.add ", moving_time: "
+  result.add movingTimeVal(xx)
+  result.add ", distance: "
+  result.add $(xx.mapIt(it.distance).foldl(a + b) / 1000)
+  result.add ", virtual: "
+  result.add virtualVal(xx)
+  result.add ")"
+

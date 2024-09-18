@@ -23,8 +23,7 @@ proc run(offset: int) =
   for x in activities:
     info "    ", x.name, "\n" & plot(x.watts, width = 110, height = 10).splitLines().mapIt("W: " & it).join("\n")
   if activities.len > 0:
-    let stat = stats(activities)
-    info "Stats: ", stat
+    info "Stat: ", stat(activities)
     row.distance = activities.distanceSumVal
     row.movingTime = activities.movingTimeVal
     row.calories = activities.caloriesSumVal
