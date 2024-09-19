@@ -3,8 +3,11 @@ import json
 import std/strformat
 import std/times
 import std/strutils
+import std/tables
 
 import oauth/oauth2
+
+import telegram
 
 from objs import defConst
 
@@ -12,6 +15,7 @@ const
   API_URL = "https://sheets.googleapis.com/v4/spreadsheets"
   TOKEN_URL = "https://accounts.google.com/o/oauth2/token"
   CLIENT_SCOPE = @["https://www.googleapis.com/auth/spreadsheets", "email"]
+  dateFormat = "M/d/YYYY"
 
 defConst(SHEET_ID)
 defConst(CLIENT_ID)
@@ -34,14 +38,16 @@ proc newGSheetClient*(): GSheetClient =
   let res = result.client.refreshToken(TOKEN_URL, CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, CLIENT_SCOPE, false)
   result.accessToken = res.body.parseJson()["access_token"].getStr()
 
-proc row*(self: GSheetClient, today: DateTime): Row =
-  let today = today.format("M/d/YYYY")
+proc row(self: GSheetClient, today: string): Row =
   let res = self.client.bearerRequest(fmt"{API_URL}/{SHEET_ID}/values/A:J?majorDimension=ROWS", self.accessToken)
   let j = res.body.parseJson
   doAssert j["majorDimension"].getStr == "ROWS"
   for i, it in j["values"].getElems:
     if it.len > 0 and it[0].getStr == today:
       return Row(num: 1+i, row: it, client: self)
+
+proc row*(self: GSheetClient, today: DateTime): Row =
+  row(self, today.format(dateFormat))
 
 proc col(x: char): int =
   int(x.byte - 'A'.byte)
@@ -94,6 +100,9 @@ proc setCol(x: Row, c: char, val: string, saveOld = false) =
   let j = res.body.parseJson
   doAssert j["updatedCells"].getInt == 1
 
+  if saveOld:
+    sendMsg(finalVal.replace("bot: ", x.row[0].getStr & ": "))
+
 proc `distance=`*(x: Row, val: string) =
   x.setCol('F', val)
 
@@ -106,5 +115,15 @@ proc `calories=`*(x: Row, val: string) =
 proc `virtual=`*(x: Row, val: string) =
   x.setCol('I', val)
 
+proc `comment=`*(x: Row, val: string) =
+  x.setCol('K', val)
+
 proc `result=`*(x: Row, val: string) =
   x.setCol('J', val, true)
+
+proc setUpdates*(self: GSheetClient, upds: Table[string, string]) =
+  for k, v in upds:
+    let row = self.row(k)
+    row.comment = v
+  
+

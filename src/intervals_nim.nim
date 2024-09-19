@@ -8,13 +8,18 @@ import asciigraph
 
 import intervals_icu
 import google_sheet
+import telegram
 
 const fmtStr = "[$date $time] - $levelname: "
 
 proc run(offset: int) =
+  let upds = getUpdates()
+
   let today = (now() + initDuration(days = offset))
   info "Process: ", today.format("yyyy-MM-dd")
   let client = newGSheetClient()
+  client.setUpdates(upds)
+
   let row = client.row(today)
   let plan = row.plan
   info "Plan: ", plan
@@ -40,7 +45,6 @@ proc main() =
   except:
     let e = getCurrentException()
     fatal "name: ", e.name, "    msg: ", e.msg, "\n", e.getStackTrace
-
 
 when isMainModule:
   main()
