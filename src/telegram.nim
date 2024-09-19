@@ -16,12 +16,14 @@ const USER_ID = TELEGRAM_USER_ID.parseInt
 
 const CHAT_ID = USER_ID
 
-proc sendMsg*(msg: string) =
+proc newTeleBot*(): TeleBot =
+  newTeleBot(TELEGRAM_API_KEY)
+
+proc sendMsg*(bot: TeleBot, msg: string) =
   let bot = newTeleBot(TELEGRAM_API_KEY)
   discard waitFor bot.sendMessage(CHAT_ID, msg, parseMode = "markdown", disableNotification = true)
 
-proc getUpdates*(): Table[string, string] =
-  let bot = newTeleBot(TELEGRAM_API_KEY)
+proc getUpdates*(bot: TeleBot): Table[string, string] =
   var clean = false
   for item in waitFor bot.getUpdates(limit = 10, timeout = 2):
     clean = true

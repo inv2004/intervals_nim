@@ -13,7 +13,8 @@ import telegram
 const fmtStr = "[$date $time] - $levelname: "
 
 proc run(offset: int) =
-  let upds = getUpdates()
+  let bot = newTeleBot()
+  let upds = bot.getUpdates()
 
   let today = (now() + initDuration(days = offset))
   info "Process: ", today.format("yyyy-MM-dd")
@@ -35,7 +36,7 @@ proc run(offset: int) =
     row.virtual = activities.virtualVal
     row.result = activities.resultVal(plan)
     if row.newResult != "":
-      sendMsg(row.newResult.replace("bot: ", row.date & ": "))
+      bot.sendMsg(row.newResult.replace("bot: ", row.date & ": "))
   info "Finished"
 
 proc main() =
