@@ -7,8 +7,6 @@ import std/tables
 
 import oauth/oauth2
 
-import telegram
-
 from objs import defConst
 
 const
@@ -31,6 +29,7 @@ type
     num: int
     row: JsonNode
     client: GSheetClient
+    newResult*: string # empty if no updates to result
 
 proc newGSheetClient*(): GSheetClient =
   new(result)
@@ -71,7 +70,7 @@ proc getOldText(txt: string): string =
       result = "  old: " & result
     result = "\n" & result
 
-proc setCol(x: Row, c: char, val: string, saveOld = false) =
+proc setCol(x: var Row, c: char, val: string, saveOld = false) =
   let old = if c.col < x.row.len: x.row[c.col].getStr else: ""
 
   let finalVal =
@@ -101,29 +100,32 @@ proc setCol(x: Row, c: char, val: string, saveOld = false) =
   doAssert j["updatedCells"].getInt == 1
 
   if saveOld:
-    sendMsg(finalVal.replace("bot: ", x.row[0].getStr & ": "))
+    x.newResult = finalVal
 
-proc `distance=`*(x: Row, val: string) =
+func date*(x: Row): string =
+  x.row['A'.col].getStr  
+
+proc `distance=`*(x: var Row, val: string) =
   x.setCol('F', val)
 
-proc `movingTime=`*(x: Row, val: string) =
+proc `movingTime=`*(x: var Row, val: string) =
   x.setCol('G', val)
 
-proc `calories=`*(x: Row, val: string) =
+proc `calories=`*(x: var Row, val: string) =
   x.setCol('H', val)
 
-proc `virtual=`*(x: Row, val: string) =
+proc `virtual=`*(x: var Row, val: string) =
   x.setCol('I', val)
 
-proc `comment=`*(x: Row, val: string) =
+proc `comment=`*(x: var Row, val: string) =
   x.setCol('K', val)
 
-proc `result=`*(x: Row, val: string) =
+proc `result=`*(x: var Row, val: string) =
   x.setCol('J', val, true)
 
 proc setUpdates*(self: GSheetClient, upds: Table[string, string]) =
   for k, v in upds:
-    let row = self.row(k)
+    var row = self.row(k)
     row.comment = v
   
 

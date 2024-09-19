@@ -20,7 +20,7 @@ proc run(offset: int) =
   let client = newGSheetClient()
   client.setUpdates(upds)
 
-  let row = client.row(today)
+  var row = client.row(today)
   let plan = row.plan
   info "Plan: ", plan
   let activities = activities(today)
@@ -34,6 +34,8 @@ proc run(offset: int) =
     row.calories = activities.caloriesSumVal
     row.virtual = activities.virtualVal
     row.result = activities.resultVal(plan)
+    if row.newResult != "":
+      sendMsg(row.newResult.replace("bot: ", row.date & ": "))
   info "Finished"
 
 proc main() =
