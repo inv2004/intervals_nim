@@ -4,7 +4,7 @@ import std/strformat
 import std/times
 import std/strutils
 
-import oauth2
+import oauth/oauth2
 
 from objs import defConst
 
