@@ -5,6 +5,7 @@ import std/json
 import std/strutils
 import std/times
 import std/tables
+import std/logging
 
 import objs
 
@@ -36,8 +37,9 @@ proc getUpdates*(): Table[string, string] =
     try:
       discard parts[0].parse("M/d/YYYY")
       result[parts[0]] = msg.text
+      discard waitFor bot.setMessageReaction(CHAT_ID, msg.messageId, @[ReactionTypeEmoji("👍")])
     except:
-      discard
+      error "cannot parse result message"
       # discard waitFor bot.sendMessage(CHAT_ID, "cannot parse result message", parseMode = "markdown", replyParameters = ReplyParameters(messageId: msg.messageId))
 
   if clean:
