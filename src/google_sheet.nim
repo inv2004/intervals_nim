@@ -21,7 +21,7 @@ defConst(CLIENT_SECRET)
 defConst(REFRESH_TOKEN)
 
 type
-  GSheetClient = ref object
+  GSheetClient* = ref object
     client: HttpClient
     accessToken: string
 

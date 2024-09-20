@@ -3,6 +3,7 @@ import std/os
 import std/strutils
 import std/logging
 import std/sequtils
+import std/tables
 
 import asciigraph
 
@@ -13,22 +14,27 @@ import telegram
 const fmtStr = "[$date $time] - $levelname: "
 
 proc run(offset: int) =
+  var gclient: GSheetClient
+
   let bot = newTeleBot()
   let upds = bot.getUpdates()
+  if upds.len > 0:
+    gclient = newGSheetClient()
+    gclient.setUpdates(upds)
 
   let today = (now() + initDuration(days = offset))
   info "Process: ", today.format("yyyy-MM-dd")
-  let client = newGSheetClient()
-  client.setUpdates(upds)
 
-  var row = client.row(today)
-  let plan = row.plan
-  info "Plan: ", plan
   let activities = activities(today)
   info "Activities:"
   for x in activities:
     info "    ", x.name, "\n" & plot(x.watts, width = 110, height = 10).splitLines().mapIt("W: " & it).join("\n")
   if activities.len > 0:
+    if gclient == nil:
+      gclient = newGSheetClient()
+    var row = gclient.row(today)
+    let plan = row.plan
+    info "Plan: ", plan
     info "Stat: ", stat(activities)
     row.distance = activities.distanceSumVal
     row.movingTime = activities.movingTimeVal
