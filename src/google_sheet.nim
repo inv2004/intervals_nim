@@ -13,7 +13,7 @@ const
   API_URL = "https://sheets.googleapis.com/v4/spreadsheets"
   TOKEN_URL = "https://accounts.google.com/o/oauth2/token"
   CLIENT_SCOPE = @["https://www.googleapis.com/auth/spreadsheets", "email"]
-  dateFormat = "M/d/YYYY"
+  DATE_FORMAT* = "M/d/YYYY"
 
 defConst(SHEET_ID)
 defConst(CLIENT_ID)
@@ -46,7 +46,7 @@ proc row(self: GSheetClient, today: string): Row =
       return Row(num: 1+i, row: it, client: self)
 
 proc row*(self: GSheetClient, today: DateTime): Row =
-  row(self, today.format(dateFormat))
+  row(self, today.format(DATE_FORMAT))
 
 proc col(x: char): int =
   int(x.byte - 'A'.byte)
