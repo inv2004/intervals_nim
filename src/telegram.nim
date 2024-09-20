@@ -28,7 +28,11 @@ proc getUpdates*(bot: TeleBot): Table[string, string] =
   for item in waitFor bot.getUpdates(limit = 10, timeout = 2):
     clean = true
     let upd = unmarshal(item, Update)
-    let msg = upd.message
+    var msg = upd.message
+    if msg.isNil:
+      msg = upd.editedMessage
+    if msg.isNil:
+      continue
     if msg.fromUser.id != USER_ID or msg.chat.id != CHAT_ID:
       return
     if msg.replyToMessage == nil:

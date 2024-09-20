@@ -30,7 +30,7 @@ proc run(offset: int) =
   for x in activities:
     info "    ", x.name, "\n" & plot(x.watts, width = 110, height = 10).splitLines().mapIt("W: " & it).join("\n")
   if activities.len > 0:
-    if gclient == nil:
+    if gclient.isNil:
       gclient = newGSheetClient()
     var row = gclient.row(today)
     let plan = row.plan
