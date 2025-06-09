@@ -2,3 +2,4 @@ intervals_nim
 logs
 libressl*
 pcre*
+src/config.nims

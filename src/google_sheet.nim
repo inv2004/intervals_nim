@@ -13,7 +13,7 @@ const
   API_URL = "https://sheets.googleapis.com/v4/spreadsheets"
   TOKEN_URL = "https://accounts.google.com/o/oauth2/token"
   CLIENT_SCOPE = @["https://www.googleapis.com/auth/spreadsheets", "email"]
-  DATE_FORMAT* = "M/d/YYYY"
+  DATE_FORMAT* = "d-MMM-YYYY"
 
 defConst(SHEET_ID)
 defConst(CLIENT_ID)
@@ -44,6 +44,7 @@ proc row(self: GSheetClient, today: string): Row =
   for i, it in j["values"].getElems:
     if it.len > 0 and it[0].getStr == today:
       return Row(num: 1+i, row: it, client: self)
+  raise newException(ValueError, "cannot find date " & today)
 
 proc row*(self: GSheetClient, today: DateTime): Row =
   row(self, today.format(DATE_FORMAT))

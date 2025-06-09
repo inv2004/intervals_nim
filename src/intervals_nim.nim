@@ -23,7 +23,7 @@ proc run(offset: int) =
     gclient.setUpdates(upds)
 
   let today = (now() + initDuration(days = offset))
-  info "Process: ", today.format("yyyy-MM-dd")
+  info "Process: ", today.format("yyyy-MMM-dd")
 
   let activities = activities(today)
   info "Activities:"
